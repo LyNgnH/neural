@@ -26,7 +26,7 @@ unsigned train_n_test(const string& file_name, NeuralNetwork<T>& nw, bool is_tra
 		unsigned n = s.find(delimiter); 
 		int label = stoi(s.substr(0, n));
 		s.erase(0, n + delimiter.length());
-		while ((n = s.find(delimiter)) != std::string::npos) {
+		while ((n = s.find(delimiter)) != -1) {
 			string token = s.substr(0, n);
 			s.erase(0, n + delimiter.length());
 			T val = stoi(token);
