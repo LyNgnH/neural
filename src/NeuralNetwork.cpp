@@ -71,7 +71,8 @@ namespace {
 	//Wrap a vector inside the matrix manipulation class
 	template<typename T>
 	MatrixManipulation<T> wrap(const vector<T>& v) {
-		MatrixManipulation<T> ret(matrix<T>(1, v));
+		matrix<T> r_m(1, v);
+		MatrixManipulation<T> ret(r_m);
 		return ret.transpose();
 	}
 }
@@ -125,7 +126,8 @@ void NeuralNetwork<T>::train(const vector<T>& data_set, const vector<T>& target)
 
 	//Second backpropagation to update input-hidden weights
 	MatrixManipulation<T> hidden_error = hidden_output.transpose() + output_error;
-	MatrixManipulation<T> oin(matrix<T>(1, data_set));
+	matrix<T> d_m(1, data_set);
+	MatrixManipulation<T> oin(d_m);
 	back_propagate(hidden_error, oin, out_hidden, learning_rate, input_hidden);
 }
 

@@ -12,6 +12,18 @@ namespace {
 
 	const unsigned NUM_THREADS = 8;
 
+	/* Helper for number of rows of a matrix*/
+	template <typename T>
+	inline unsigned num_rows(const matrix<T>& m) {
+		return m.size();
+	}
+
+	/* Helper for getting number of columns of a matrix*/
+	template <typename T>
+	inline unsigned num_columns(const matrix<T>& m) {
+		return m.empty() ? 0 : m[0].size();
+	}
+
 	/* Validate if a matrix is well-formatted*/
 	template <typename T>
 	bool check_matrix(const matrix<T>& m) {
@@ -46,22 +58,31 @@ namespace {
 		return true;
 	}
 
-	/* Helper for number of rows of a matrix*/
-	template <typename T>
-	inline unsigned num_rows(const matrix<T>& m) {
-		return m.size();
-	}
-
-	/* Helper for getting number of columns of a matrix*/
-	template <typename T>
-	inline unsigned num_columns(const matrix<T>& m) {
-		return m.empty() ? 0 : m[0].size();
-	}
+	
 
 	/* Simple dot product algorithm*/
 	template <typename T>
 	void classic_dot(const matrix<T>& m1, const matrix<T>& m2, matrix<T>& result) {
 		dot(m1, m2, result, 0, num_rows(m1));
+	}
+
+	/* Cache-friendly dot product*/
+	template<typename T>
+	void dot(const matrix<T>& m1, const matrix<T>& m2, matrix<T>& res, unsigned start, unsigned end) {
+		unsigned m2_cols = num_columns(m2);
+		unsigned m2_rows = num_rows(m2);
+		vector<T> m2_tmp(m2_rows);
+		for (unsigned j = 0; j < m2_cols; j++)
+		{
+			for (unsigned k = 0; k < m2_rows; k++)
+				m2_tmp[k] = m2[k][j];
+
+			for (unsigned i = start; i < end; i++)
+			{
+				for (unsigned k = 0; k < m2_rows; k++)
+					res[i][j] += m1[i][k] * m2_tmp[k];
+			}
+		}
 	}
 
 	/* Compute dot product using multiple threads*/
@@ -92,24 +113,7 @@ namespace {
 		}
 	}
 
-	/* Cache-friendly dot product*/
-	template<typename T>
-	void dot(const matrix<T>& m1, const matrix<T>& m2, matrix<T>& res, unsigned start, unsigned end) {
-		unsigned m2_cols = num_columns(m2);
-		unsigned m2_rows = num_rows(m2);
-		vector<T> m2_tmp(m2_rows);
-		for (unsigned j = 0; j < m2_cols; j++)
-		{
-			for (unsigned k = 0; k < m2_rows; k++)
-				m2_tmp[k] = m2[k][j];
-
-			for (unsigned i = start; i < end; i++)
-			{
-				for (unsigned k = 0; k < m2_rows; k++)
-					res[i][j] += m1[i][k] * m2_tmp[k];
-			}
-		}
-	}
+	
 
 }
 
